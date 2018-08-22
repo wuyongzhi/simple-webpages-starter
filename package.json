@@ -1,0 +1,22 @@
+{
+  "name": "simple-webpages-starter",
+  "version": "1.0.0",
+  "description": "simple webpages starter",
+  "main": "gulpfile.js",
+  "scripts": {
+    "start": "gulp",
+    "dev": "gulp",
+    "build": "gulp build",
+    "clean": "gulp clean"
+  },
+  "author": "srdrm@icloud.com",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^2.17.5",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-pug": "^3.1.0",
+    "gulp-sass": "^2.3.2",
+    "gulp-watch": "^5.0.1"
+  }
+}
