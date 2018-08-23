@@ -23,7 +23,7 @@ yarn
 
 2. 启动开发
 ```
-npm dev
+npm run dev
 ```
 
 ## 问题 
