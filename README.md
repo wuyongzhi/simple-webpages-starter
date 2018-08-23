@@ -21,11 +21,13 @@ yarn
 ```
 
 
-2. 启动开发
+2. 启动开发模式
 ```
 npm run dev
 ```
 
-## 问题 
 
-`node-sass` 因为一些问题，可能安装失败，请参阅：https://github.com/if2er/blog/issues/31
+3. 打包
+```
+npm run build
+```
