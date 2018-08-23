@@ -1,10 +1,13 @@
 var gulp = require('gulp');
 var browserSync = require('browser-sync');
-var sass = require('gulp-sass');
+var log = require('fancy-log');
+
+//var sass = require('gulp-sass');
 var pug = require('gulp-pug');
 var watch = require('gulp-watch')
 var del = require('del')
 var reload = browserSync.reload;
+var stylus = require('gulp-stylus');
 
 resources = ['app/**/*', '!app/**/*.pug', '!app/**/*.scss']
 
@@ -12,7 +15,7 @@ gulp.task('clean', function (cb) {
   return del(['dist'], cb)
 })
 
-gulp.task('build', ['clean', 'copy', 'templates', 'sass'], function () {
+gulp.task('build', ['clean', 'copy', 'templates', 'stylus'], function () {
 
 })
 
@@ -20,9 +23,14 @@ gulp.task('build', ['clean', 'copy', 'templates', 'sass'], function () {
  * Compile pug files into HTML
  */
 gulp.task('templates', function () {
+  let p = pug({ pretty: true })
+  p.on('error', (e) => {
+    log.error(e)
+    p.end()
+  })
   return gulp
     .src('app/**/*.pug')
-    .pipe(pug({ pretty: true }))
+    .pipe(p)
     .pipe(gulp.dest('./dist/'));
 });
 
@@ -43,21 +51,38 @@ gulp.task('pug-watch', ['templates'], function () {
 /**
  * Sass task for live injecting into all browsers
  */
-gulp.task('sass', function () {
+// gulp.task('sass', function () {
+//   return gulp
+//     .src('app/**/*.scss')
+//     .pipe(sass())
+//     .on('error', sass.logError)
+//     .pipe(gulp.dest('./dist/'));
+// });
+
+gulp.task('stylus', function () {
+  let styl = stylus()
+  styl.on('error', (e) => {
+    log.error(e)
+    styl.end()
+  })
   return gulp
-    .src('app/**/*.scss')
-    .pipe(sass())
-    .on('error', sass.logError)
+    .src(['app/**/*.styl', 'app/**/*.stylus'])
+    .pipe(styl)
     .pipe(gulp.dest('./dist/'));
 });
 
 /**
  * Serve and watch the scss/pug files for changes
  */
-gulp.task('default', ['sass', 'templates'], function () {
-  browserSync({ notify: false, server: ['app', 'dist'] });
+gulp.task('default', ['stylus', 'templates'], function () {
+  browserSync({
+    notify: false,
+    open: false,
+    server: ['app', 'dist']
+  });
 
-  gulp.watch('app/**/*.scss', ['sass', reload]);
+  // gulp.watch('app/**/*.scss', ['sass', reload]);
+  gulp.watch('app/**/*.{styl,stylus}', ['stylus', reload])
 
   // watch('./app/**/*.pug', { ignoreInitial: false })
   //   .pipe(pug())
