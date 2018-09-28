@@ -1,3 +1,5 @@
+var error = require('os')
+
 var gulp = require('gulp');
 var browserSync = require('browser-sync');
 var log = require('fancy-log');
@@ -13,10 +15,6 @@ resources = ['app/**/*', '!app/**/*.pug', '!app/**/*.scss']
 
 gulp.task('clean', function (cb) {
   return del(['dist'], cb)
-})
-
-gulp.task('build', ['clean', 'copy', 'templates', 'stylus'], function () {
-
 })
 
 /**
@@ -36,7 +34,7 @@ gulp.task('templates', function () {
 
 
 
-gulp.task('copy', () => {
+gulp.task('copy', function () {
   return gulp.src(resources)
     .pipe(gulp.dest('./dist/'))
 })
@@ -44,9 +42,9 @@ gulp.task('copy', () => {
  * Important!!
  * Separate task for the reaction to `.pug` files
  */
-gulp.task('pug-watch', ['templates'], function () {
+gulp.task('pug-watch', gulp.series('templates', function () {
   return reload();
-});
+}));
 
 /**
  * Sass task for live injecting into all browsers
@@ -62,6 +60,7 @@ gulp.task('pug-watch', ['templates'], function () {
 gulp.task('stylus', function () {
   let styl = stylus()
   styl.on('error', (e) => {
+    console.log(e)
     log.error(e)
     styl.end()
   })
@@ -71,10 +70,13 @@ gulp.task('stylus', function () {
     .pipe(gulp.dest('./dist/'));
 });
 
+gulp.task('build', gulp.series('clean', 'copy', 'templates', 'stylus'))
+
+
 /**
  * Serve and watch the scss/pug files for changes
  */
-gulp.task('default', ['stylus', 'templates'], function () {
+gulp.task('default', gulp.series('build', function (done) {
   browserSync({
     notify: false,
     open: false,
@@ -82,12 +84,15 @@ gulp.task('default', ['stylus', 'templates'], function () {
   });
 
   // gulp.watch('app/**/*.scss', ['sass', reload]);
-  gulp.watch('app/**/*.{styl,stylus}', ['stylus', reload])
+  gulp.watch('app/**/*.{styl,stylus}').on('change', gulp.series('stylus', reload))
 
   // watch('./app/**/*.pug', { ignoreInitial: false })
   //   .pipe(pug())
   //   .pipe(gulp.dest('./dist/'))
   //   .pipe(reload({ stream: true }));
-  gulp.watch('app/**/*.pug', ['pug-watch'])
-  gulp.watch('app/**/*.{css,js,html,png,jpeg,gif,jpg}', reload)
-});
+  gulp.watch('app/**/*.pug').on('change', gulp.series('templates', reload))
+  // gulp.watch('app/**/*.html').on('change', gulp.series('copy', reload))
+
+  gulp.watch('app/**/*.{css,js,html,png,jpeg,gif,jpg}').on('change', gulp.series(reload))
+  done()
+}))

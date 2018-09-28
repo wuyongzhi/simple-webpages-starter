@@ -1,4 +1,4 @@
-node_modules
-npm-debug.log
-dist
+node_modules/
+dist/
 yarn.lock
+npm-debug.log
